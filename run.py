@@ -1,2 +1,7 @@
-from firebase import Firebase
- 
+from sensors import *
+
+def main():
+    pass
+
+if __name__ == "__main__":
+    main()
