@@ -4,7 +4,7 @@ from firebase_admin import credentials, db
 class Database:
     ULTRASONIC = "Ultrasonic"
     ACCELEROMETER = "Accelerometer"
-    MOTOR_CONTROLLER = "Motor Controller"
+    MOTOR_CONTROLLER = "Motor Controller/state"
     SIM = "Simulate/enabled"
     def __init__(self):
         self.__cred = firebase_admin.credentials.Certificate("serviceAccountKey.json")
