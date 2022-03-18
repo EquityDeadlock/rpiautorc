@@ -2,7 +2,10 @@ import firebase_admin, json
 from firebase_admin import credentials, db
 
 class Database:
-    def __init__(self):        
+    ULTRASONIC = "Ultrasonic"
+    ACCELEROMETER = "Accelerometer"
+    MOTOR_CONTROLLER = "Motor Controller"
+    def __init__(self):
         self.__cred = firebase_admin.credentials.Certificate("serviceAccountKey.json")
         self.__default_app = firebase_admin.initialize_app(self.__cred, {"databaseURL":"https://autonomous-rc-default-rtdb.firebaseio.com/"})
     
