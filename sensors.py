@@ -1,6 +1,19 @@
 import json, subprocess, random
+from turtle import distance
 import RPi.GPIO as GPIO          
-from time import sleep
+from time import sleep, time
+
+#GPIO Mode (BOARD / BCM)
+GPIO.setmode(GPIO.BCM)
+ 
+#set GPIO Pins
+GPIO_TRIGGER = 4
+GPIO_ECHO = 17
+ 
+#set GPIO direction (IN / OUT)
+GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
+GPIO.setup(GPIO_ECHO, GPIO.IN)
+
 # GPIO pin numbers
 in1 = 24
 in2 = 23
@@ -48,14 +61,39 @@ class Ultrasonic(Sensor):
         if super()._isSimulation():
             self.__minDistance = 2.0
             self.__maxDistance = 30.0
+    
+    def distance(self):
+        # set Trigger to HIGH
+        GPIO.output(GPIO_TRIGGER, True)
+    
+        # set Trigger after 0.01ms to LOW
+        sleep(0.00001)
+        GPIO.output(GPIO_TRIGGER, False)
+    
+        StartTime = time()
+        StopTime = time()
+    
+        # save StartTime
+        while GPIO.input(GPIO_ECHO) == 0:
+            StartTime = time()
+    
+        # save time of arrival
+        while GPIO.input(GPIO_ECHO) == 1:
+            StopTime = time()
+    
+        # time difference between start and arrival
+        TimeElapsed = StopTime - StartTime
+        # multiply with the sonic speed (34300 cm/s)
+        # and divide by 2, because there and back
+        distance = (TimeElapsed * 34300) / 2
+    
+        return distance
 
     def getData(self) -> json:
         if super()._isSimulation():
             return {"distance":super()._getRandomFloat(2.0, 30.0, 2)}
         else:
-            return {"distance":0.0}
-
-
+            return {"distance":self.distance()}
 
 class Motor(Sensor):
     def __init__(self, sim=False):
@@ -68,7 +106,7 @@ class Motor(Sensor):
         sleep(.25)
         GPIO.output(21, GPIO.HIGH)
 
-        if self.state == "r":
+        if self.state == "j":
             print("run")
 
             if(Motor.temp1 == 1):
@@ -108,7 +146,22 @@ class Motor(Sensor):
             GPIO.output(in3,GPIO.LOW)
             GPIO.output(in4,GPIO.HIGH)
             temp1 = 0
+        elif self.state == 'l':
+            print("left")
+            GPIO.output(in1,GPIO.HIGH)
+            GPIO.output(in2,GPIO.LOW)
+            GPIO.output(in3,GPIO.LOW)
+            GPIO.output(in4,GPIO.HIGH)
+            temp1 = 0
         
+        elif self.state == 'r':
+            print("right")
+            GPIO.output(in1,GPIO.LOW)
+            GPIO.output(in2,GPIO.HIGH)
+            GPIO.output(in3,GPIO.HIGH)
+            GPIO.output(in4,GPIO.LOW)
+            temp1 = 0
+
         elif self.state == 'e':
             GPIO.cleanup()
             print("GPIO clean up")

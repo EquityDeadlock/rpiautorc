@@ -27,8 +27,13 @@ def checkSim():
     Sensor.SIMULATE = fireDB.get() # Toggle all Sensors to simulated values
 def checkMotor():
     fireDB.setReference(Database.MOTOR_CONTROLLER)
-    motor.state = fireDB.get()
-
+    temp = ""
+    for key, value in ultra.getData().items():
+        temp = value
+    if (temp <= 15):
+        motor.state = "s"
+    else:
+        motor.state = fireDB.get()
 
 if __name__ == "__main__":
     main()
