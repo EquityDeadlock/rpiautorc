@@ -7,8 +7,8 @@ from time import sleep, time
 GPIO.setmode(GPIO.BCM)
  
 #set GPIO Pins
-GPIO_TRIGGER = 4
-GPIO_ECHO = 17
+GPIO_TRIGGER = 6
+GPIO_ECHO = 22
  
 #set GPIO direction (IN / OUT)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
@@ -99,8 +99,15 @@ class Motor(Sensor):
     def __init__(self, sim=False):
         super().__init__(sim)
         self.state = "s"
+        self.last = "s"
+    def turnOff(self):
+        GPIO.output(in1,GPIO.LOW)
+        GPIO.output(in2,GPIO.LOW)
+        GPIO.output(in3,GPIO.LOW)
+        GPIO.output(in4,GPIO.LOW)
+        self.state = "s"
     def getData(self) -> json:
-        return ""
+        return {"state":self.state}
     def checkMotor(self):
         GPIO.output(21, GPIO.LOW)
         sleep(.25)
@@ -123,6 +130,8 @@ class Motor(Sensor):
                 GPIO.output(in4,GPIO.HIGH)
                 print("reverse")
 
+            self.last = "j"
+
 
         elif self.state == 's':
             print("stop")
@@ -130,6 +139,7 @@ class Motor(Sensor):
             GPIO.output(in2,GPIO.LOW)
             GPIO.output(in3,GPIO.LOW)
             GPIO.output(in4,GPIO.LOW)
+            self.last = "s"
 
         elif self.state == 'f':
             print("forward")
@@ -138,6 +148,7 @@ class Motor(Sensor):
             GPIO.output(in3,GPIO.HIGH)
             GPIO.output(in4,GPIO.LOW)
             Motor.temp1 = 1
+            self.last = "f"
 
         elif self.state == 'b':
             print("backward")
@@ -146,6 +157,7 @@ class Motor(Sensor):
             GPIO.output(in3,GPIO.LOW)
             GPIO.output(in4,GPIO.HIGH)
             temp1 = 0
+            self.last = "b"
         elif self.state == 'l':
             print("left")
             GPIO.output(in1,GPIO.HIGH)
@@ -153,6 +165,7 @@ class Motor(Sensor):
             GPIO.output(in3,GPIO.LOW)
             GPIO.output(in4,GPIO.HIGH)
             temp1 = 0
+            self.last = "l"
         
         elif self.state == 'r':
             print("right")
@@ -161,6 +174,7 @@ class Motor(Sensor):
             GPIO.output(in3,GPIO.HIGH)
             GPIO.output(in4,GPIO.LOW)
             temp1 = 0
+            self.last = "r"
 
         elif self.state == 'e':
             GPIO.cleanup()
